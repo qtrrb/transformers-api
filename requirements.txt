@@ -4,3 +4,4 @@ uvicorn>=0.21.1
 pydantic>=1.10.7
 transformers>=4.28.1
 accelerate>=0.18.0
+sentencepiece>=0.1.98
