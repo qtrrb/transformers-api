@@ -271,5 +271,5 @@ def stream_generate(
         if len(input_ids[0]) >= original_size + max_new_tokens:
             break
 
-        if tokenizer.eos_token_id in input_ids:
+        if input_ids[0][-1].item() == tokenizer.eos_token_id:
             break
