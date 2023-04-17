@@ -197,6 +197,8 @@ def generate(
     return generated_text
 
 
+# Based on the generate function of
+# https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py 
 @torch.no_grad()
 def stream_generate(
     prompt: str,
@@ -267,4 +269,7 @@ def stream_generate(
             break
 
         if len(input_ids[0]) >= original_size + max_new_tokens:
+            break
+
+        if tokenizer.eos_token_id in input_ids:
             break
