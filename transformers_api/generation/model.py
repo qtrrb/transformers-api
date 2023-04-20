@@ -164,7 +164,7 @@ def generate(
     global tokenizer, model
 
     if tokenizer is None or model is None:
-        return {"error": "Model not loaded."}
+        raise ValueError("Model is not loaded.")
 
     stopping_criteria_ids = (
         tokenizer(stopping_criteria, return_tensors="pt").input_ids.to(device)[0]
@@ -191,6 +191,9 @@ def generate(
     generated_text = tokenizer.decode(
         output[:, input_ids.shape[1] :][0], skip_special_tokens=True
     )
+
+    # Remove all instances of the Unicode unknown character (�)
+    generated_text = generated_text.replace("\uFFFD", "")
 
     return generated_text
 
@@ -224,7 +227,7 @@ def stream_generate(
     global tokenizer, model
 
     if tokenizer is None or model is None:
-        return {"error": "Model not loaded."}
+        raise ValueError("Model is not loaded.")
 
     input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
 
@@ -255,11 +258,16 @@ def stream_generate(
         probs = torch.nn.functional.softmax(next_tokens_scores, dim=-1)
         next_token_id = torch.multinomial(probs, num_samples=1)
 
+        # Note: This is done to handle Sentencepiece based tokenizers,
+        # as they don't preprend the prefix space to the start of a word
         tokens_previous = tokenizer.decode(input_ids[0], skip_special_tokens=True)
         input_ids = torch.cat((input_ids, next_token_id), dim=1)
         tokens = tokenizer.decode(input_ids[0], skip_special_tokens=True)
 
         new_tokens = tokens[len(tokens_previous) :]
+
+        # Remove all instances of the Unicode unknown character (�)
+        new_tokens = new_tokens.replace("\uFFFD", "")
 
         yield new_tokens
 
