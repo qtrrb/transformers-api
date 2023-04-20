@@ -85,10 +85,8 @@ def load_unsharded_model(model_name: str) -> bool:
         model = AutoModelForCausalLM.from_pretrained(
             model_path, torch_dtype=torch.float16, device_map="auto"
         )
-        if type(model) is LlamaForCausalLM:
-            tokenizer = LlamaTokenizer.from_pretrained(model_path, padding_side="left")
-        else:
-            tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side="left")
+
+        tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side="left")
 
         model_id = model_name
         return True
@@ -170,7 +168,7 @@ def generate(
 
     stopping_criteria_ids = (
         tokenizer(stopping_criteria, return_tensors="pt").input_ids.to(device)[0]
-        if stopping_criteria is not (None or "")
+        if stopping_criteria is not None and stopping_criteria != ""
         else None
     )
 
@@ -198,7 +196,7 @@ def generate(
 
 
 # Based on the generate function of
-# https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py 
+# https://github.com/huggingface/transformers/blob/main/src/transformers/generation/utils.py
 @torch.no_grad()
 def stream_generate(
     prompt: str,
@@ -232,7 +230,7 @@ def stream_generate(
 
     stopping_criteria_ids = (
         tokenizer(stopping_criteria, return_tensors="pt").input_ids.to(device)[0]
-        if stopping_criteria is not (None or "")
+        if stopping_criteria is not None and stopping_criteria != ""
         else None
     )
 
