@@ -13,6 +13,8 @@ from transformers import (
     RepetitionPenaltyLogitsProcessor,
     TemperatureLogitsWarper,
     TopPLogitsWarper,
+    PreTrainedModel,
+    PreTrainedTokenizerBase,
 )
 from transformers_api.generation.stopping_criteria import TextStoppingCriteria
 
@@ -163,8 +165,8 @@ def generate(
 
     global tokenizer, model
 
-    if tokenizer is None or model is None:
-        raise ValueError("Model is not loaded.")
+    assert isinstance(model, PreTrainedModel), "Model is not loaded."
+    assert isinstance(tokenizer, PreTrainedTokenizerBase), "Model is not loaded."
 
     stopping_criteria_ids = (
         tokenizer(stopping_criteria, return_tensors="pt").input_ids.to(device)[0]
@@ -226,8 +228,8 @@ def stream_generate(
 
     global tokenizer, model
 
-    if tokenizer is None or model is None:
-        raise ValueError("Model is not loaded.")
+    assert isinstance(model, PreTrainedModel), "Model is not loaded."
+    assert isinstance(tokenizer, PreTrainedTokenizerBase), "Model is not loaded."
 
     input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
 
