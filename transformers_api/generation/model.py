@@ -1,6 +1,7 @@
 import torch
 import os
 import gc
+import logging
 from accelerate import init_empty_weights, load_checkpoint_and_dispatch
 from transformers import (
     AutoConfig,
@@ -22,6 +23,8 @@ MODEL_ROOT_FOLDER = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "../models/"
 )
 
+logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
 
 tokenizer = None
 model = None
@@ -49,6 +52,7 @@ def load_model(model_name: str) -> bool:
     if model_name == model_id:
         return True
     else:
+        logger.info(f"Loading new model {model_name}.")
         if tokenizer is not None:
             tokenizer = None
         if model is not None:
@@ -91,9 +95,10 @@ def load_unsharded_model(model_name: str) -> bool:
         tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side="left")
 
         model_id = model_name
+        logger.info(f"Model {model_name} is now loaded.")
         return True
     except Exception as e:
-        print(e)
+        logger.exception(e)
         return False
 
 
@@ -134,9 +139,10 @@ def load_sharded_model(model_name: str) -> bool:
             tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side="left")
 
         model_id = model_name
+        logger.info(f"Model {model_name} is now loaded.")
         return True
     except Exception as e:
-        print(e)
+        logger.exception(e)
         return False
 
 
