@@ -7,8 +7,6 @@ from transformers import (
     AutoConfig,
     AutoTokenizer,
     AutoModelForCausalLM,
-    LlamaForCausalLM,
-    LlamaTokenizer,
     StoppingCriteriaList,
     LogitsProcessorList,
     RepetitionPenaltyLogitsProcessor,
@@ -133,10 +131,7 @@ def load_sharded_model(model_name: str) -> bool:
             model, model_path, device_map="auto", dtype=torch.float16
         )
 
-        if type(model) is LlamaForCausalLM:
-            tokenizer = LlamaTokenizer.from_pretrained(model_path)
-        else:
-            tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side="left")
+        tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side="left")
 
         model_id = model_name
         logger.info(f"Model {model_name} is now loaded.")
